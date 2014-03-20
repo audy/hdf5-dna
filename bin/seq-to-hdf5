@@ -27,6 +27,7 @@ def main():
                                   maxshape=(None, ),
                                   chunks=True)
 
+    # todo: catch CTRL-C and remember to close the file
     with open(args.input) as handle:
         records = SeqIO.parse(handle, args.format)
 
