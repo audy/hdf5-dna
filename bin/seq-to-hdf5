@@ -2,6 +2,8 @@
 
 import argparse
 import gzip
+import os
+import logging
 
 from Bio import SeqIO
 import numpy as np
@@ -14,6 +16,7 @@ def parse_args():
     parser.add_argument('--hdf5', required=True)
     parser.add_argument('--format', default='fasta')
     parser.add_argument('--gzip', default=False, action='store_true', help='sequences are gzipped?')
+    parser.add_argument('--log', default='/dev/stderr')
 
     return parser.parse_args()
 
@@ -22,6 +25,8 @@ def main():
     args = parse_args()
 
     h5_file = h5py.File(args.hdf5, 'w')
+
+    logging.basicConfig(level=logging.INFO, filename=args.log)
 
     dset = h5_file.create_dataset('sequences',
                                   (100,),
@@ -35,6 +40,8 @@ def main():
     else:
         opener = open
 
+    size = float(os.path.getsize(args.input))
+
     # todo: catch CTRL-C and remember to close the file
     with opener(args.input) as handle:
         records = SeqIO.parse(handle, args.format)
@@ -45,6 +52,11 @@ def main():
             except ValueError:
                 dset.resize(dset.size + 100, axis=0)
                 dset[i] = str(record.seq)
+
+            if i%1000 == 0:
+                posn = handle.tell()
+                logging.info('%.2g' % (posn/size))
+
 
     h5_file.close()
 
