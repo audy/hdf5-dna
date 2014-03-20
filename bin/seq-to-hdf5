@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import gzip
 
 from Bio import SeqIO
 import numpy as np
@@ -12,6 +13,7 @@ def parse_args():
     parser.add_argument('--input', default='/dev/stdin')
     parser.add_argument('--hdf5', required=True)
     parser.add_argument('--format', default='fasta')
+    parser.add_argument('--gzip', default=False, action='store_true', help='sequences are gzipped?')
 
     return parser.parse_args()
 
@@ -27,8 +29,14 @@ def main():
                                   maxshape=(None, ),
                                   chunks=True)
 
+
+    if args.gzip:
+        opener = gzip.open
+    else:
+        opener = open
+
     # todo: catch CTRL-C and remember to close the file
-    with open(args.input) as handle:
+    with opener(args.input) as handle:
         records = SeqIO.parse(handle, args.format)
 
         for i, record in enumerate(records):
