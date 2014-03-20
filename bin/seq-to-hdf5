@@ -21,13 +21,20 @@ def main():
 
     h5_file = h5py.File(args.hdf5, 'w')
 
-    dset = h5_file.create_dataset('sequences', (100,), dtype='S10')
+    dset = h5_file.create_dataset('sequences',
+                                  (100,),
+                                  dtype=h5py.special_dtype(vlen=str),
+                                  maxshape=(None, ),
+                                  chunks=True)
 
     with open(args.input) as handle:
         records = SeqIO.parse(handle, args.format)
 
         for i, record in enumerate(records):
-            dset[i] = str(record.seq)
+            try:
+                dset[i] = str(record.seq)
+            except ValueError:
+                dset.resize(dset.size + 100, axis=0)
 
     h5_file.close()
 
