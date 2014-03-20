@@ -35,6 +35,7 @@ def main():
                 dset[i] = str(record.seq)
             except ValueError:
                 dset.resize(dset.size + 100, axis=0)
+                dset[i] = str(record.seq)
 
     h5_file.close()
 
