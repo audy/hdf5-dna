@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+
+import argparse
+
+from Bio import SeqIO
+import numpy as np
+import h5py
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--hdf5', required=True)
+
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+
+    h5_file = h5py.File(args.hdf5, 'r')
+
+    group = h5_file['/']
+    dset = group['sequences']
+
+    for i, record in enumerate(dset):
+        print '%s = "%s"' % (i, dset[i])
+
+
+if __name__ == '__main__':
+    main()
