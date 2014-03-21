@@ -19,6 +19,7 @@ def parse_args():
     parser.add_argument('--gzip', default=False, action='store_true', help='sequences are gzipped?')
     parser.add_argument('--init-size', default=10, type=int)
     parser.add_argument('--growth-size', default=10, type=int)
+    parser.add_argument('--dataset', default='sequences')
     parser.add_argument('--log', default='/dev/stderr')
 
     return parser.parse_args()
@@ -42,7 +43,7 @@ def main():
     logging.basicConfig(level=logging.INFO, filename=args.log)
 
     logging.info('initializing db with size %s' % args.init_size)
-    dset = h5_file.create_dataset('sequences',
+    dset = h5_file.create_dataset(args.dataset,
                                   (args.init_size,),
                                   dtype=h5py.special_dtype(vlen=str),
                                   maxshape=(None, ),

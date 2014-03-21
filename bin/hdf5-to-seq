@@ -10,6 +10,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--hdf5', required=True)
+    parser.add_argument('--dataset', default='sequences')
 
     return parser.parse_args()
 
@@ -20,7 +21,7 @@ def main():
     h5_file = h5py.File(args.hdf5, 'r')
 
     group = h5_file['/']
-    dset = group['sequences']
+    dset = group[args.dataset]
 
     for i, record in enumerate(dset):
         print '%s = "%s"' % (i, dset[i])

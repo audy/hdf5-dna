@@ -13,6 +13,7 @@ def parse_args():
     parser.add_argument('--hdf5', required=True)
     parser.add_argument('--log', default='/dev/stderr')
     parser.add_argument('--seed', default=False, type=int)
+    parser.add_argument('--dataset', default='sequences')
     parser.add_argument('--sample-size', required=True, type=int)
 
     return parser.parse_args()
@@ -36,7 +37,7 @@ def main():
     h5_file = h5py.File(args.hdf5, 'r')
 
     group = h5_file['/']
-    dset = group['sequences']
+    dset = group[args.dataset]
 
     logging.info('using dataset: %s' % dset)
 
