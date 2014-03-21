@@ -24,7 +24,11 @@ def main():
     group = h5_file['/']
     dset = group['sequences']
 
-    for i in np.random.choice(dset, args.sample_size):
+    sample_index = np.random.random_integers(0, dset.size, args.sample_size)
+
+    sample = [ dset[x] for x in sample_index ]
+
+    for i in sample:
         print i
 
 if __name__ == '__main__':
