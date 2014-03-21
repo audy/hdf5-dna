@@ -11,6 +11,12 @@ Examples and experiments of using HDF5 and h5py with biological sequence data.
 
 see `bin/*` for details.
 
+## Help
+
+```sh
+for i in bin/*; do python $i --help; done
+```
+
 ## Tests
 
 Just run `test/test-hdf5-dna`.
