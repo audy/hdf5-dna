@@ -16,4 +16,5 @@ bin/hdf5-to-seq \
 bin/sample-seqs \
   --hdf5 test.hdf5 \
   --sample-size 1 \
+  --seed 42 \
   > /dev/null
