@@ -11,6 +11,23 @@ Examples and experiments of using HDF5 and h5py with biological sequence data.
 
 see `bin/*` for details.
 
+## Tests
+
+Just run `test/test-hdf5-dna`.
+
+### Pre-Commit Hook
+
+Add this to `.git/hooks/pre-commit` to run the tests before committing.
+
+```sh
+if [ $? -eq 0 ]; then
+  echo "Tests passed."
+else
+  echo "Tests failed. Aborting commit."
+  exit -1
+fi
+```
+
 ## Installation
 
 `pip install -r requirements.txt`
