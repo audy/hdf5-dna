@@ -60,7 +60,7 @@ def main():
                 if i%10000 == 0:
                     logging.info('%s sequences' % i)
         except KeyboardInterrupt:
-            print '\nFinishing up...'
+            logging.info('\nFinishing up...')
         finally:
             logging.info('wrote %s sequences' % dset.size)
             h5_file.close()
