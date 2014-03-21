@@ -5,6 +5,7 @@ import gzip
 import os
 import logging
 
+from mpi4py import MPI
 from Bio import SeqIO
 import numpy as np
 import h5py
@@ -24,7 +25,7 @@ def parse_args():
 def main():
     args = parse_args()
 
-    h5_file = h5py.File(args.hdf5, 'w')
+    h5_file = h5py.File(args.hdf5, 'w', driver='mpio', comm=MPI.COMM_WORLD)
 
     logging.basicConfig(level=logging.INFO, filename=args.log)
 
