@@ -20,6 +20,14 @@ def parse_args():
 
     return parser.parse_args()
 
+def load_seqs(dset, records):
+    for i, record in enumerate(records):
+        try:
+            dset[i] = str(record.seq)
+        except ValueError:
+            dset.resize(dset.size + 10000, axis=0)
+            dset[i] = str(record.seq)
+
 
 def main():
     args = parse_args()
@@ -42,23 +50,14 @@ def main():
 
     size = float(os.path.getsize(args.input))
 
-    # todo: catch CTRL-C and remember to close the file
     with opener(args.input) as handle:
         records = SeqIO.parse(handle, args.format)
-
-        for i, record in enumerate(records):
-            try:
-                dset[i] = str(record.seq)
-            except ValueError:
-                dset.resize(dset.size + 100, axis=0)
-                dset[i] = str(record.seq)
-
-            if i%1000 == 0:
-                posn = handle.tell()
-                logging.info('%.2g' % (posn/size))
-
-
-    h5_file.close()
+        try:
+            load_seqs(dset, records)
+        except KeyboardInterrupt:
+            print '\nFinishing up...'
+        finally:
+            h5_file.close()
 
 
 if __name__ == '__main__':
