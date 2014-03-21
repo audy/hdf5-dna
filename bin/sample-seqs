@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import itertools
 
 import h5py
 import numpy as np
@@ -18,8 +19,9 @@ def parse_args():
 
 
 def sample_seqs(dset, sample_size):
-    index = np.random.random_integers(0, dset.size, sample_size)
-    return [ dset[x] for x in index ]
+    for _ in itertools.repeat(None, sample_size):
+        index = np.random.random_integers(0, dset.size, 1)[0]
+        yield dset[index]
 
 
 def main():
