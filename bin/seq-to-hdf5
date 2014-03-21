@@ -18,16 +18,17 @@ def parse_args():
     parser.add_argument('--format', default='fasta')
     parser.add_argument('--gzip', default=False, action='store_true', help='sequences are gzipped?')
     parser.add_argument('--init-size', default=10, type=int)
+    parser.add_argument('--growth-size', default=10, type=int)
     parser.add_argument('--log', default='/dev/stderr')
 
     return parser.parse_args()
 
-def load_seqs(dset, records):
+def load_seqs(dset, records, growth_size=10000):
     for i, record in enumerate(records):
         try:
             dset[i] = str(record.seq)
         except ValueError:
-            dset.resize(dset.size + 10000, axis=0)
+            dset.resize(dset.size + growth_size, axis=0)
             dset[i] = str(record.seq)
 
         yield i
@@ -58,8 +59,8 @@ def main():
     with opener(args.input) as handle:
         records = SeqIO.parse(handle, args.format)
         try:
-            for i in load_seqs(dset, records):
-                if i%10000 == 0:
+            for i in load_seqs(dset, records, growth_size=args.growth_size):
+                if i%args.growth_size == 0:
                     logging.info('%s sequences' % i)
         except KeyboardInterrupt:
             logging.info('\nFinishing up...')
