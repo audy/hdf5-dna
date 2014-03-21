@@ -20,6 +20,8 @@ Just run `test/test-hdf5-dna`.
 Add this to `.git/hooks/pre-commit` to run the tests before committing.
 
 ```sh
+test/test-hdf5-dna 2>/dev/null
+
 if [ $? -eq 0 ]; then
   echo "Tests passed."
 else
