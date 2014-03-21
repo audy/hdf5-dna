@@ -11,6 +11,15 @@ Examples and experiments of using HDF5 and h5py with biological sequence data.
 
 see `bin/*` for details.
 
+## Parallel
+
+This branch was created to see if h5py-mpi would work with MPI but it
+turned out that you can't use h5py-mpi with vlen datasets. Since I'm not
+making the assumption that your sequences will all be the same length,
+we can't use mpi for h5py. However, in some cases, read lengths are
+always the same (for example, Illumina). Therefore, this branch might be
+useful.
+
 ## Installation
 
 `pip install -r requirements.txt`
