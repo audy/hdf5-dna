@@ -16,6 +16,11 @@ def parse_args():
     return parser.parse_args()
 
 
+def sample_seqs(dset, sample_size):
+    index = np.random.random_integers(0, dset.size, sample_size)
+    return [ dset[x] for x in index ]
+
+
 def main():
     args = parse_args()
 
@@ -31,12 +36,9 @@ def main():
 
     logging.info('getting sample of size %s' % args.sample_size)
 
-    sample_index = np.random.random_integers(0, dset.size, args.sample_size)
-
-    sample = [ dset[x] for x in sample_index ]
 
     logging.info('writing to stdout')
-    for i in sample:
+    for i in sample_seqs(dset, args.sample_size):
         print i
 
 if __name__ == '__main__':
