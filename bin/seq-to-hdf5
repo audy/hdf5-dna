@@ -37,7 +37,7 @@ def main():
     logging.basicConfig(level=logging.INFO, filename=args.log)
 
     dset = h5_file.create_dataset('sequences',
-                                  (100,),
+                                  (10000,),
                                   dtype=h5py.special_dtype(vlen=str),
                                   maxshape=(None, ),
                                   chunks=True)
