@@ -6,8 +6,7 @@ Examples and experiments of using HDF5 and h5py with biological sequence data.
 
 - Create HDF5 database from any sequence format that BioPython supports
   (FASTA, FASTQ, ...)
-- Output sequences from HDF5 database
-- Randomly sample sequences from HDF5 database
+- Quickly generate random samples of sequences
 
 see `bin/*` for details.
 
