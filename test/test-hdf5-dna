@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+set -x
+
+bin/seq-to-hdf5 \
+  --input test/data/test.fasta \
+  --hdf5 test.hdf5
+
+bin/hdf5-to-seq \
+  --hdf5 test.hdf5 \
+  > /dev/null
+
+bin/sample-seqs \
+  --hdf5 test.hdf5 \
+  --sample-size 1
