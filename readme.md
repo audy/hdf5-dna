@@ -22,7 +22,8 @@ Just run `test/test-hdf5-dna`.
 
 ### Pre-Commit Hook
 
-Add this to `.git/hooks/pre-commit` to run the tests before committing.
+Add this to `.git/hooks/pre-commit` to automatically run and check tests
+after running `git commit`.
 
 ```sh
 test/test-hdf5-dna 2>/dev/null
