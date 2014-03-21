@@ -45,8 +45,8 @@ def main():
 
 
     logging.info('writing to stdout')
-    for i in sample_seqs(dset, args.sample_size):
-        print i
+    for i, s in enumerate(sample_seqs(dset, args.sample_size)):
+        print '>%s\n%s' % (i, s)
 
 if __name__ == '__main__':
     main()
