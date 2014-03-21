@@ -19,15 +19,23 @@ def parse_args():
 def main():
     args = parse_args()
 
+    logging.basicConfig(level=logging.INFO, filename=args.log)
+
+    logging.info('opening %s' % args.hdf5)
     h5_file = h5py.File(args.hdf5, 'r')
 
     group = h5_file['/']
     dset = group['sequences']
 
+    logging.info('using dataset: %s' % dset)
+
+    logging.info('getting sample of size %s' % args.sample_size)
+
     sample_index = np.random.random_integers(0, dset.size, args.sample_size)
 
     sample = [ dset[x] for x in sample_index ]
 
+    logging.info('writing to stdout')
     for i in sample:
         print i
 
