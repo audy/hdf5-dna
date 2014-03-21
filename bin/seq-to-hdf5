@@ -9,6 +9,7 @@ from Bio import SeqIO
 import numpy as np
 import h5py
 
+
 def parse_args():
     parser = argparse.ArgumentParser()
 
@@ -27,6 +28,8 @@ def load_seqs(dset, records):
         except ValueError:
             dset.resize(dset.size + 10000, axis=0)
             dset[i] = str(record.seq)
+
+        yield i
 
 
 def main():
@@ -53,7 +56,9 @@ def main():
     with opener(args.input) as handle:
         records = SeqIO.parse(handle, args.format)
         try:
-            load_seqs(dset, records)
+            for i in load_seqs(dset, records):
+                if i%10000 == 0:
+                    logging.info('%s sequences' % i)
         except KeyboardInterrupt:
             print '\nFinishing up...'
         finally:
