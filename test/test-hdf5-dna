@@ -7,7 +7,6 @@ bin/seq-to-hdf5 \
   --input test/data/test.fasta \
   --init-size 1 \
   --growth-size 1 \
-  --dataset test \
   --hdf5 test.hdf5
 
 bin/hdf5-to-seq \

@@ -5,9 +5,12 @@ import gzip
 import os
 import logging
 
+from collections import defaultdict
+
 from Bio import SeqIO
 import numpy as np
 import h5py
+
 
 
 def parse_args():
@@ -18,22 +21,26 @@ def parse_args():
     parser.add_argument('--format', default='fasta')
     parser.add_argument('--gzip', default=False, action='store_true', help='sequences are gzipped?')
     parser.add_argument('--init-size', default=10, type=int)
-    parser.add_argument('--growth-size', default=10, type=int)
+    parser.add_argument('--growth-size', default=10000, type=int)
     parser.add_argument('--dataset', default='sequences')
     parser.add_argument('--log', default='/dev/stderr')
 
     return parser.parse_args()
 
-def load_seqs(dset, records, growth_size=10000):
-    for i, record in enumerate(records):
+def load_seqs(dsets, records, growth_size=10000):
+    indices = defaultdict(lambda: 0)
+    for record in records:
+        seq = str(record.seq)
+        id = str(record.id)
+        index = indices[id]
         try:
-            dset[i] = str(record.seq)
+            dsets[id][index] = seq
         except ValueError:
-            dset.resize(dset.size + growth_size, axis=0)
-            dset[i] = str(record.seq)
-
-        yield i
-
+            dsets[id].resize(dsets[id].size + growth_size, axis=0)
+            dsets[id][index] = seq
+        finally:
+            indices[id] += 1
+        yield indices
 
 def main():
     args = parse_args()
@@ -42,13 +49,19 @@ def main():
 
     logging.basicConfig(level=logging.INFO, filename=args.log)
 
-    logging.info('initializing db with size %s' % args.init_size)
-    dset = h5_file.create_dataset(args.dataset,
-                                  (args.init_size,),
-                                  dtype=h5py.special_dtype(vlen=str),
-                                  maxshape=(None, ),
-                                  chunks=True)
+    class DataSets(dict):
 
+        def __missing__(self, key):
+            self[key] = h5_file.create_dataset(key,
+                                              (args.init_size,),
+                                              dtype=h5py.special_dtype(vlen=str),
+                                              maxshape=(None, ),
+                                              chunks=True)
+            print '%s samples' % len(self.keys())
+            return self[key]
+
+
+    dsets = DataSets()
 
     if args.gzip:
         opener = gzip.open
@@ -59,14 +72,17 @@ def main():
 
     with opener(args.input) as handle:
         records = SeqIO.parse(handle, args.format)
+
+        # just get "left" pairs.
+        records = ( r for i, r in enumerate(records) if i%2 == 0 )
+
         try:
-            for i in load_seqs(dset, records, growth_size=args.growth_size):
-                if i%args.growth_size == 0:
-                    logging.info('%s sequences' % i)
+            for n, i in enumerate(load_seqs(dsets, records, growth_size=args.growth_size)):
+                if n%10000 == 0:
+                    logging.info('Found %g avg. sequences in %s samples (tot=%s)' % (sum(i.values())/float(len(i)), len(i.keys()), n))
         except KeyboardInterrupt:
             logging.info('\nFinishing up...')
         finally:
-            logging.info('wrote %s sequences' % dset.size)
             h5_file.close()
 
 
