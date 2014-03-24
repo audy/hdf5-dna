@@ -22,7 +22,7 @@ def parse_args():
 def sample_seqs(dset, sample_size):
     for _ in itertools.repeat(None, sample_size):
         index = np.random.random_integers(0, dset.size, 1)[0]
-        yield dset[index]
+        yield (index, dset[index])
 
 
 def main():
@@ -45,7 +45,7 @@ def main():
 
 
     logging.info('writing to stdout')
-    for i, s in enumerate(sample_seqs(dset, args.sample_size)):
+    for i, s in sample_seqs(dset, args.sample_size):
         print '>%s\n%s' % (i, s)
 
 if __name__ == '__main__':
