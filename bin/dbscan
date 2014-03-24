@@ -1,0 +1,83 @@
+#!/usr/bin/env python
+
+import argparse
+import logging
+import itertools
+
+import h5py
+import numpy as np
+
+from sklearn.pipeline import Pipeline
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.cluster import MeanShift, DBSCAN, estimate_bandwidth
+from sklearn.preprocessing import StandardScaler
+
+# MeanShift always returns 1 cluster
+# DBSCAN seems to work better
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--hdf5', required=True)
+    parser.add_argument('--log', default='/dev/stderr')
+    parser.add_argument('--seed', default=False, type=int)
+    parser.add_argument('--dataset', default='sequences')
+    parser.add_argument('--sample-size', required=True, type=int)
+    parser.add_argument('--n-samples', type=int, default=1)
+    parser.add_argument('--ngram-size', type=int, default=4)
+
+    return parser.parse_args()
+
+
+def sample_seqs(dset, sample_size):
+    index = np.random.random_integers(0, dset.size, sample_size)
+    return [ dset[i] for i in index ]
+
+
+def main():
+    args = parse_args()
+
+    logging.basicConfig(level=logging.INFO, filename=args.log)
+
+    logging.info('opening %s' % args.hdf5)
+
+    # setup db
+
+    h5_file = h5py.File(args.hdf5, 'r')
+
+    group = h5_file['/']
+    dset = group[args.dataset]
+
+    # setup clustering
+
+    vocabulary = { ''.join(s): i for i, s in enumerate(itertools.product('gatc', repeat=args.ngram_size)) }
+
+
+    hasher = CountVectorizer(analyzer='char',
+                             ngram_range=(args.ngram_size, args.ngram_size),
+                             vocabulary=vocabulary)
+
+    for i in range(0, args.n_samples):
+
+        logging.info('sampling')
+        sample = sample_seqs(dset, args.sample_size)
+
+        logging.info('transforming')
+
+        hashed = hasher.fit_transform(sample).todense().astype('float64')
+
+        scaled = StandardScaler().fit_transform(hashed)
+
+#        bandwidth = estimate_bandwidth(scaled, n_samples=500)
+#        logging.info('bandwidth: %s' % bandwidth)
+
+        estimator = DBSCAN()
+
+        logging.info('fitting')
+        labels = estimator.fit_predict(scaled)
+
+        logging.info('n_clusters: %s' % len(set(labels)))
+
+
+if __name__ == '__main__':
+    main()
